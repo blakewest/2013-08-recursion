@@ -5,31 +5,24 @@
 
 //converts object to JSON notation representing it. 
 var stringifyJSON = function (obj) {
-  // your code goes here
-  //converts anything to JSON. Probably need to know what we're looking at first.
 
-  //check type. If X type and certain conditions are met, do Y --> that's our base case. 
-  //do a for loop of the passed in object. call stringify on the item in the for loop. This will Recurse down until you've found the lowest case. 
-  
-  //if typeof obj = object, you'll def need to go down another level.
-  // if typeof obj = string, number, boolean or other primitive, then you can safely just make that the string.
   var stringified = ""
 
-  if (Object.prototype.toString.call(obj) === "[object Null]") {
+  if (Object.prototype.toString.call(obj) === "[object Null]") {											// checking up front for null/undefined/function edge cases
   	return stringified += "null";
   }else if (Object.prototype.toString.call(obj) === "[object Undefined]" || typeof obj === "function") {
   	return stringified;
   }
 
-  if (typeof obj != "object") {
-  	if (typeof obj === "string") {
+  if (typeof obj != "object") {																//checking for primitive types. This really is the base-case. If we have these
+  	if (typeof obj === "string") {															//we can just return it straight up. 
   		return stringified += '"' + obj.toString() + '"';
   	}else {
   		return stringified += obj.toString();
 	 }
   }
-  
-  if (Object.prototype.toString.call(obj) === "[object Object]" ) {
+  																							//we now know we have an object of some kind
+  if (Object.prototype.toString.call(obj) === "[object Object]" ) {                			//this tests if it's either an empty array or object, and returns appropriately.
   	if (Object.keys(obj).length === 0){
   		return stringified += "{}";
   	}
@@ -37,51 +30,33 @@ var stringifyJSON = function (obj) {
   	return stringified += "[]";
   }
 
-  if (Object.prototype.toString.call(obj) === "[object Array]" ) {
-  		stringified += "[";
-  		for (var i = 0; i < obj.length; i++) {
+  if (Object.prototype.toString.call(obj) === "[object Array]" ) {							//if we have an array, do the appropriate thing.
+  		stringified += "[";																	//this kicks off any transcription of arrays
+  		for (var i = 0; i < obj.length; i++) {												//cycling through each item in the array and recursing down with our funciton
   			var contents = stringifyJSON(obj[i]);
   			stringified += contents;
   			if (i < obj.length - 1) {
-  				stringified += "," ;
+  				stringified += "," ;														//puts in comma whenever it's not the last item in the array.
   			}
   			
   		}
-  		stringified += "]";
+  		stringified += "]";																	//seals off the array.
   	}else {
-  		stringified += "{"
+  		stringified += "{"																	//this kicks off any object transcription
   		for (item in obj) {
-  			var itemRef = item;
-  			var contents = stringifyJSON(obj[item]);
+  			var itemRef = item;																//this is only here cuz var item gets re-written if an object contains another object. 
+  			var contents = stringifyJSON(obj[item]);										//finds out and stringifies the value of the key 
 
-  			if (contents != "") {
-  				stringified += stringifyJSON(itemRef) + ":" ;
-  				stringified += contents;
+  			if (contents != "") {															//if we didn't get back any null/undefined garbage, then continue on. sort of like "try" 
+  				stringified += stringifyJSON(itemRef) + ":" ;								//puts in the key plus a ":" + the contents, and then if it's not the last item, we'll
+  				stringified += contents;													//put in a comma too.
   				if (itemRef != Object.keys(obj)[Object.keys(obj).length - 1]) {
   					stringified += ",";
   				}
   			}
-  		
-  			
-  			
   		}
-  		stringified += "}";
+  		stringified += "}";																	//close off the object
   	 }
 
-  return stringified
+  return stringified																		//final product
 };
-
-
-// //
-// 325
-// down vote
-// accepted
-// The method given in the ECMAScript standard to find the class of Object is to use the toString method from Object.prototype.
-
-// if( Object.prototype.toString.call( someVar ) === '[object Array]' ) {
-//     alert( 'Array!' );
-// }
-// Or you could use typeof to test if it is a String:
-
-// if( typeof someVar === 'string' ) {
-//     someVar = [ someVar ];
